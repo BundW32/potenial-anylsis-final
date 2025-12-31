@@ -1,0 +1,20 @@
+
+# Abhängigkeiten
+node_modules/
+.pnp
+.pnp.js
+
+# Build-Output
+dist/
+build/
+
+# Lokale Entwicklung
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# System-Dateien
+.DS_Store
+Thumbs.db

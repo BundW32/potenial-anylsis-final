@@ -1,0 +1,7 @@
+{
+  "name": "B&W Immobilien Management UG - Potentialanalyse",
+  "description": "KI-gestützte Analyse von Mietpotentialen basierend auf Echtzeit-Marktdaten.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
