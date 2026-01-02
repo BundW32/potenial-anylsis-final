@@ -90,10 +90,12 @@ export interface AnalysisResult {
 
 // Global declaration for the AI Studio IDX environment
 declare global {
-  // Augment the existing AIStudio interface to ensure it has the required methods.
-  // We avoid redeclaring Window.aistudio to prevent type conflicts with the environment's declaration.
   interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
+    hasSelectedApiKey(): Promise<boolean>;
+    openSelectKey(): Promise<void>;
+  }
+
+  interface Window {
+    aistudio?: AIStudio;
   }
 }
