@@ -15,8 +15,10 @@ export default defineConfig(({ mode }) => {
       sourcemap: false,
     },
     define: {
-      // Prioritize the specific API Key replacement
+      // Inject the API Key securely as a string
       'process.env.API_KEY': JSON.stringify(env.VITE_API_KEY || env.API_KEY || ''),
+      // Prevent "process is not defined" error in browser
+      'process.env': {}
     },
     server: {
       port: 3000,

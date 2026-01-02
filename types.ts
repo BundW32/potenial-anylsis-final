@@ -89,13 +89,14 @@ export interface AnalysisResult {
 }
 
 // Global declaration for the AI Studio IDX environment
-declare global {
-  interface AIStudio {
-    hasSelectedApiKey(): Promise<boolean>;
-    openSelectKey(): Promise<void>;
-  }
+// Renamed to avoid collision with existing global type
+export interface GoogleAIStudio {
+  hasSelectedApiKey(): Promise<boolean>;
+  openSelectKey(): Promise<void>;
+}
 
+declare global {
   interface Window {
-    aistudio?: AIStudio;
+    aistudio?: GoogleAIStudio;
   }
 }
