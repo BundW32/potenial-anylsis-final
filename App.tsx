@@ -17,7 +17,18 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const checkKey = async () => {
-      // If we are in the specific Google IDX environment with aistudio
+      // PRIORITY 1: Check Injected Environment Variables
+      // The vite.config.ts replaces process.env.API_KEY with the actual string during build.
+      // We rely solely on this injection to avoid "import.meta" runtime errors in some environments.
+      
+      const envKey = process.env.API_KEY;
+
+      if (envKey && typeof envKey === 'string' && envKey.length > 0 && envKey !== '""') {
+        setHasKey(true);
+        return;
+      }
+
+      // PRIORITY 2: Google IDX Environment (AI Studio)
       if (window.aistudio) {
         try {
           const selected = await window.aistudio.hasSelectedApiKey();
@@ -26,15 +37,8 @@ const App: React.FC = () => {
           setHasKey(false); 
         }
       } else {
-        // In a standard deployment (Vercel), assume key is provided via env vars
-        // If process.env.API_KEY is defined (via vite config), allow access.
-        if (process.env.API_KEY) {
-          setHasKey(true);
-        } else {
-          // If no key is found in env, we still set false to show the lock screen
-          // (though the button won't work without aistudio, it prevents immediate crash)
-          setHasKey(false);
-        }
+        // Fallback: No key found in any environment
+        setHasKey(false);
       }
     };
     checkKey();
@@ -46,7 +50,7 @@ const App: React.FC = () => {
         await window.aistudio.openSelectKey();
         setHasKey(true);
       } else {
-        alert("In dieser Hosting-Umgebung muss der API Key über die Umgebungsvariablen (VITE_API_KEY) konfiguriert werden.");
+        alert("Kein AI Studio erkannt. Bitte konfiguriere 'VITE_API_KEY' in deiner .env Datei oder den Deployment-Einstellungen.");
       }
     } catch (e) { console.error(e); }
   };
@@ -69,6 +73,7 @@ const App: React.FC = () => {
   };
 
   if (hasKey === false) {
+    const isIDX = !!window.aistudio;
     return (
       <div className="w-full bg-[#020617] flex items-center justify-center p-8 min-h-[500px] rounded-[2rem]">
         <div className="max-w-md w-full bg-[#0f172a] rounded-[2.5rem] shadow-2xl p-10 text-center space-y-6 border border-white/5 ring-1 ring-white/10">
@@ -77,11 +82,32 @@ const App: React.FC = () => {
           </div>
           <div className="space-y-2">
             <h2 className="text-xl font-black text-white uppercase tracking-tight">Systemzugriff erforderlich</h2>
-            <p className="text-slate-500 text-xs leading-relaxed uppercase tracking-widest font-bold">B&W Real-Time Intelligence</p>
+            <p className="text-slate-500 text-xs leading-relaxed uppercase tracking-widest font-bold">
+              {isIDX 
+                ? "B&W Real-Time Intelligence" 
+                : "API Key Konfiguration fehlt"}
+            </p>
+            {!isIDX && (
+              <div className="text-slate-400 text-sm space-y-2">
+                <p>Der Server konnte keinen API Key finden.</p>
+                <p className="text-xs bg-white/5 p-3 rounded border border-white/10">
+                  Stellen Sie sicher, dass in Vercel die Umgebungsvariable <br/>
+                  <code className="text-[#f5931f] font-bold">VITE_API_KEY</code> <br/>
+                  gesetzt ist und führen Sie ein Redeploy durch.
+                </p>
+              </div>
+            )}
           </div>
-          <button onClick={handleOpenKeySelector} className="w-full py-5 bg-[#f5931f] text-white font-black rounded-2xl hover:bg-white hover:text-slate-950 transition-all shadow-xl flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
-            API-Key auswählen <Sparkles size={18} />
-          </button>
+          
+          {isIDX ? (
+            <button onClick={handleOpenKeySelector} className="w-full py-5 bg-[#f5931f] text-white font-black rounded-2xl hover:bg-white hover:text-slate-950 transition-all shadow-xl flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
+              API-Key auswählen <Sparkles size={18} />
+            </button>
+          ) : (
+            <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+               <p className="text-rose-400 text-[10px] font-medium uppercase tracking-widest">Deployment Check Erforderlich</p>
+            </div>
+          )}
         </div>
       </div>
     );
