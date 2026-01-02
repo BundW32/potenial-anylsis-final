@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { UserInput, AnalysisResult } from "../types";
 
@@ -24,7 +25,7 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
     properties: {
       estimatedMarketRentPerSqm: {
         type: Type.NUMBER,
-        description: "Geschätzte Marktmiete pro Quadratmeter in EUR",
+        description: "Geschätzte Marktmiete pro Quadratmeter in EUR für die spezifische Mikrolage",
       },
       estimatedTotalMarketRent: {
         type: Type.NUMBER,
@@ -37,9 +38,9 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
       detailedLocationAnalysis: {
         type: Type.OBJECT,
         properties: {
-          infrastructure: { type: Type.STRING, description: "Analyse der Infrastruktur" },
-          demographics: { type: Type.STRING, description: "Analyse der Demografie" },
-          marketTrend: { type: Type.STRING, description: "Analyse des Markttrends" },
+          infrastructure: { type: Type.STRING, description: "Analyse der Infrastruktur im Stadtteil" },
+          demographics: { type: Type.STRING, description: "Analyse der Demografie im Stadtteil" },
+          marketTrend: { type: Type.STRING, description: "Analyse des Markttrends im Stadtteil" },
         },
         required: ["infrastructure", "demographics", "marketTrend"],
       },
@@ -96,11 +97,17 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
     ],
   };
 
+  const districtInfo = input.district ? `STADTTEIL / MIKROLAGE: ${input.district} (Sehr wichtig!)` : "Mikrolage: Automatisch basierend auf Adresse ermitteln";
+
   const prompt = `
-    Führe eine detaillierte Immobilien-Marktwert-Analyse für folgendes Objekt durch:
+    Führe eine hochpräzise Immobilien-Marktwert-Analyse (MIKROLAGEN-ANALYSE) für folgendes Objekt durch:
     
-    ADRESSE: ${input.address}
-    DETAILS:
+    STANDORT:
+    - Adresse: ${input.address}
+    - Stadt: ${input.city || "Aus Adresse ableiten"}
+    - ${districtInfo}
+    
+    OBJEKT-DETAILS:
     - Typ: ${input.propertyType}
     - Fläche: ${input.sizeSqm} m²
     - Zimmer: ${input.rooms}
@@ -123,10 +130,14 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
     - Heizung modernisiert: ${input.heatingModernizationYear || "Nein"}
     - Dämmung modernisiert: ${input.insulationModernizationYear || "Nein"}
 
-    AUFGABE:
-    Berechne das realistische Mietpotenzial und analysiere die Lagequalität basierend auf deutschen Immobilienmarktdaten.
-    Berücksichtige Mietspiegel-Niveaus für die Region und spezifische Wohnwertmerkmale.
-    Identifiziere Hebel zur Wertsteigerung.
+    AUFGABE (KRITISCH):
+    1. Identifiziere den EXAKTEN Stadtteil (Mikrolage) dieser Adresse. 
+    2. Verwende Mietpreise, die spezifisch für diesen Stadtteil gelten, NICHT den Durchschnitt der Gesamtstadt.
+    3. Beispiel: Unterscheide zwischen "München-Lehel" (teuer) und "München-Hasenbergl" (günstiger), oder "Berlin-Mitte" vs "Berlin-Marzahn".
+    4. Analysiere die Infrastruktur genau an diesem Standort (ÖPNV Anbindung, Lärmpegel, Nähe zu Parks).
+    5. Berücksichtige Mietspiegel-Niveaus für diese spezifische Wohnlage.
+    
+    Deine Schätzung muss die Realität des Stadtteils widerspiegeln.
   `;
 
   const response = await ai.models.generateContent({

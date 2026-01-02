@@ -28,6 +28,8 @@ export enum EnergyClass {
 
 export interface UserInput {
   address: string;
+  district?: string; // Neu: Stadtteil für Mikrolage
+  city?: string;     // Neu: Stadt
   propertyType: PropertyType;
   sizeSqm: number;
   rooms: number;
@@ -90,7 +92,6 @@ export interface AnalysisResult {
 
 // Global declaration for the AI Studio IDX environment
 declare global {
-  // Define AIStudio interface to merge with any existing global declaration
   interface AIStudio {
     hasSelectedApiKey(): Promise<boolean>;
     openSelectKey(): Promise<void>;

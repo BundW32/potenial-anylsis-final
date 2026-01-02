@@ -18,9 +18,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkKey = async () => {
       // PRIORITY 1: Check Injected Environment Variables
-      // The vite.config.ts replaces process.env.API_KEY with the actual string during build.
-      // We rely solely on this injection to avoid "import.meta" runtime errors in some environments.
-      
+      // The vite.config.ts replaces process.env.API_KEY with the value of VITE_API_KEY during build.
       const envKey = process.env.API_KEY;
 
       if (envKey && typeof envKey === 'string' && envKey.length > 0 && envKey !== '""') {
@@ -28,7 +26,7 @@ const App: React.FC = () => {
         return;
       }
 
-      // PRIORITY 2: Google IDX Environment (AI Studio)
+      // PRIORITY 2: Google IDX Environment (Legacy support)
       if (window.aistudio) {
         try {
           const selected = await window.aistudio.hasSelectedApiKey();
@@ -49,8 +47,6 @@ const App: React.FC = () => {
       if (window.aistudio) {
         await window.aistudio.openSelectKey();
         setHasKey(true);
-      } else {
-        alert("Kein AI Studio erkannt. Bitte konfiguriere 'VITE_API_KEY' in deiner .env Datei oder den Deployment-Einstellungen.");
       }
     } catch (e) { console.error(e); }
   };
@@ -90,11 +86,16 @@ const App: React.FC = () => {
             {!isIDX && (
               <div className="text-slate-400 text-sm space-y-2">
                 <p>Der Server konnte keinen API Key finden.</p>
-                <p className="text-xs bg-white/5 p-3 rounded border border-white/10">
-                  Stellen Sie sicher, dass in Vercel die Umgebungsvariable <br/>
-                  <code className="text-[#f5931f] font-bold">VITE_API_KEY</code> <br/>
-                  gesetzt ist und führen Sie ein Redeploy durch.
-                </p>
+                <div className="text-xs bg-white/5 p-4 rounded-xl border border-white/10 text-left space-y-2">
+                  <p className="font-bold text-white">Anleitung für Vercel:</p>
+                  <ol className="list-decimal list-inside space-y-1 text-slate-400">
+                    <li>Öffnen Sie die Vercel Project Settings</li>
+                    <li>Gehen Sie zu "Environment Variables"</li>
+                    <li>Key: <code className="text-[#f5931f]">VITE_API_KEY</code></li>
+                    <li>Value: Ihr Google Gemini API Key</li>
+                    <li>Starten Sie ein "Redeploy"</li>
+                  </ol>
+                </div>
               </div>
             )}
           </div>
@@ -105,7 +106,7 @@ const App: React.FC = () => {
             </button>
           ) : (
             <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-               <p className="text-rose-400 text-[10px] font-medium uppercase tracking-widest">Deployment Check Erforderlich</p>
+               <p className="text-rose-400 text-[10px] font-medium uppercase tracking-widest">Warte auf Konfiguration...</p>
             </div>
           )}
         </div>
