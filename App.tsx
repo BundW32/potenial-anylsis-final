@@ -17,18 +17,37 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const checkKey = async () => {
-      try {
-        const selected = await window.aistudio.hasSelectedApiKey();
-        setHasKey(selected);
-      } catch (e) { setHasKey(false); }
+      // If we are in the specific Google IDX environment with aistudio
+      if (window.aistudio) {
+        try {
+          const selected = await window.aistudio.hasSelectedApiKey();
+          setHasKey(selected);
+        } catch (e) { 
+          setHasKey(false); 
+        }
+      } else {
+        // In a standard deployment (Vercel), assume key is provided via env vars
+        // If process.env.API_KEY is defined (via vite config), allow access.
+        if (process.env.API_KEY) {
+          setHasKey(true);
+        } else {
+          // If no key is found in env, we still set false to show the lock screen
+          // (though the button won't work without aistudio, it prevents immediate crash)
+          setHasKey(false);
+        }
+      }
     };
     checkKey();
   }, []);
 
   const handleOpenKeySelector = async () => {
     try {
-      await window.aistudio.openSelectKey();
-      setHasKey(true);
+      if (window.aistudio) {
+        await window.aistudio.openSelectKey();
+        setHasKey(true);
+      } else {
+        alert("In dieser Hosting-Umgebung muss der API Key über die Umgebungsvariablen (VITE_API_KEY) konfiguriert werden.");
+      }
     } catch (e) { console.error(e); }
   };
 
