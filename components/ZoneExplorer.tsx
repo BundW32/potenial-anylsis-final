@@ -15,53 +15,56 @@ const ZoneExplorer: React.FC<ZoneExplorerProps> = ({ zones, mapLink, cityName })
   const activeZone = zones.find(z => z.id === selectedZone);
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-      <div className="px-5 py-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/50">
+    <div className="bg-[#1e293b] rounded-[2rem] shadow-2xl border border-white/5 overflow-hidden ring-1 ring-white/5">
+      <div className="px-8 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-950/20">
         <div>
-          <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2 uppercase">
+          <h3 className="text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-[0.2em]">
             <MapIcon className="text-[#f5931f]" size={14} />
-            Mietspiegel-Zonen: {cityName}
+            Lage-Klassifizierung: {cityName}
           </h3>
         </div>
       </div>
 
-      <div className="p-4">
-        {/* Compact Tabs */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="p-6">
+        {/* Tabs */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
           {zones.map((zone) => (
             <button
               key={zone.id}
               onClick={() => setSelectedZone(zone.id)}
-              className={`p-2 rounded-lg border transition-all text-center ${
+              className={`p-4 rounded-2xl border transition-all text-center ${
                 selectedZone === zone.id 
-                  ? 'border-[#f5931f] bg-[#f5931f]/5 ring-2 ring-[#f5931f]/10' 
-                  : 'border-slate-100 bg-slate-50 hover:border-slate-200'
+                  ? 'border-[#f5931f] bg-[#f5931f]/10 ring-2 ring-[#f5931f]/10' 
+                  : 'border-white/5 bg-white/5 hover:border-white/20'
               }`}
             >
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: zone.color || '#cbd5e1' }}></div>
-                <span className="text-[8px] font-black uppercase text-slate-400">Klasse</span>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" style={{ backgroundColor: zone.color || '#cbd5e1' }}></div>
+                <span className="text-[8px] font-black uppercase text-slate-500 tracking-widest">Markt</span>
               </div>
-              <h4 className="font-bold text-slate-800 text-[10px] truncate">{zone.name}</h4>
+              <h4 className={`font-black text-[10px] uppercase tracking-tighter truncate ${selectedZone === zone.id ? 'text-white' : 'text-slate-500'}`}>{zone.name}</h4>
+              <p className="text-[9px] font-bold text-[#f5931f] mt-1">{zone.impactPercent}</p>
             </button>
           ))}
         </div>
 
-        {/* Detailed Zone Content - Slimmer */}
+        {/* Content */}
         {activeZone && (
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-100 animate-in fade-in duration-300">
-            <div className="space-y-3">
-              <div className="flex items-start gap-2">
-                <Info size={14} className="text-slate-400 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-slate-600 leading-normal">
+          <div className="bg-slate-950/40 rounded-2xl p-6 border border-white/5 animate-in fade-in duration-300">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-white/5 rounded-lg mt-0.5">
+                   <Info size={14} className="text-slate-400 shrink-0" />
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed font-medium">
                   {activeZone.description}
                 </p>
               </div>
 
               {activeZone.examples && activeZone.examples.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200">
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
                   {activeZone.examples.map((ex, i) => (
-                    <span key={i} className="text-[9px] bg-white text-slate-500 px-2 py-0.5 rounded border border-slate-200">
+                    <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-white/5 text-slate-500 px-3 py-1.5 rounded-lg border border-white/5">
                       {ex}
                     </span>
                   ))}

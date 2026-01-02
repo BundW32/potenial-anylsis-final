@@ -2,7 +2,7 @@
 import React from 'react';
 import { AnalysisResult, UserInput } from '../types';
 import { ResponsiveContainer, ComposedChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
-import { TrendingUp, ArrowRight, BarChart3, PlusCircle, MinusCircle } from 'lucide-react';
+import { TrendingUp, ArrowRight, BarChart3, PlusCircle, MinusCircle, ShieldCheck, Bus, Users, LineChart, Quote } from 'lucide-react';
 import ZoneExplorer from './ZoneExplorer';
 
 interface AnalysisResultsProps {
@@ -15,39 +15,42 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
   const targetPerSqm = result.estimatedMarketRentPerSqm;
 
   const chartData = [
-    { name: 'IST', price: currentPerSqm, color: '#1e293b' },
-    { name: 'MARKT', price: targetPerSqm, color: '#f5931f' }
+    { name: 'IST-MIETE', price: currentPerSqm, color: '#475569' },
+    { name: 'MARKT-MIETE', price: targetPerSqm, color: '#f5931f' }
   ];
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
   const formatSqm = (val: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(val) + '/m²';
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
-      {/* Metrics Row - More Compact */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <p className="text-[8px] text-slate-400 font-black uppercase mb-1">Status</p>
-          <p className="text-xl font-black text-slate-800">{formatCurrency(input.currentColdRent)}</p>
-          <p className="text-[9px] text-slate-500 font-bold">{formatSqm(currentPerSqm)}</p>
+    <div className="space-y-10 animate-fade-in pb-20">
+      {/* Metrics Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-[#1e293b] p-8 rounded-[2rem] border border-white/5">
+          <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-3">Ist (Netto Kalt)</p>
+          <p className="text-3xl font-black text-white tracking-tight">{formatCurrency(input.currentColdRent)}</p>
+          <p className="text-[11px] text-slate-400 font-bold mt-2">{formatSqm(currentPerSqm)}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <p className="text-[8px] text-slate-400 font-black uppercase mb-1">Zielwert</p>
-          <p className="text-xl font-black text-slate-900">{formatCurrency(result.estimatedTotalMarketRent)}</p>
-          <p className="text-[9px] text-[#f5931f] font-black">{formatSqm(targetPerSqm)}</p>
+        <div className="bg-[#1e293b] p-8 rounded-[2rem] border border-white/5 ring-2 ring-[#f5931f]/20 shadow-2xl">
+          <p className="text-[9px] text-[#f5931f] font-black uppercase tracking-widest mb-3">Ziel (Markt)</p>
+          <p className="text-3xl font-black text-white tracking-tight">{formatCurrency(result.estimatedTotalMarketRent)}</p>
+          <p className="text-[11px] text-[#f5931f] font-black mt-2">{formatSqm(targetPerSqm)}</p>
         </div>
-        <div className="bg-slate-900 p-4 rounded-xl shadow-xl text-white">
-          <p className="text-[8px] text-[#f5931f] font-black uppercase mb-1">Ertrag p.a.</p>
-          <p className="text-xl font-black">+{formatCurrency(result.potentialYearlyGain)}</p>
-          <div className="flex items-center gap-1 mt-0.5">
-             <TrendingUp size={10} className="text-green-400" />
-             <span className="text-[9px] text-green-400 font-black">+{result.rentGapPercentage.toFixed(0)}%</span>
+        <div className="bg-gradient-to-br from-[#034933] to-[#020617] p-8 rounded-[2rem] border border-emerald-500/20 shadow-2xl text-white">
+          <p className="text-[9px] text-emerald-400 font-black uppercase tracking-widest mb-3">Ertrag p.a.</p>
+          <p className="text-3xl font-black tracking-tight">+{formatCurrency(result.potentialYearlyGain)}</p>
+          <div className="flex items-center gap-2 mt-2">
+             <TrendingUp size={14} className="text-emerald-400" />
+             <span className="text-[11px] text-emerald-400 font-black uppercase tracking-widest">+{result.rentGapPercentage.toFixed(1)}% Gap</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <p className="text-[8px] text-slate-400 font-black uppercase mb-1">Sicherheit</p>
-          <p className="text-xl font-black text-slate-800">{result.confidenceScore}%</p>
-          <p className="text-[9px] text-slate-500 font-bold">Präzision</p>
+        <div className="bg-[#1e293b] p-8 rounded-[2rem] border border-white/5">
+          <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-3">KI-Konfidenz</p>
+          <p className="text-3xl font-black text-white tracking-tight">{result.confidenceScore}%</p>
+          <div className="flex items-center gap-2 mt-2">
+            <ShieldCheck size={14} className="text-sky-400" />
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Grounded AI</p>
+          </div>
         </div>
       </div>
 
@@ -58,22 +61,24 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
         />
       )}
 
-      {/* Main Analysis Block - More Tightly Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 space-y-6">
-           <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-             <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-               <BarChart3 size={14} className="text-[#f5931f]" />
-               <h3 className="text-[9px] font-black text-slate-800 uppercase tracking-widest">Marktvergleich</h3>
+      {/* Main Analysis Block */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-7 space-y-8">
+           <div className="bg-[#0f172a] rounded-[2.5rem] shadow-2xl border border-white/5 overflow-hidden">
+             <div className="px-10 py-6 border-b border-white/5 bg-slate-950/30 flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                 <BarChart3 size={18} className="text-[#f5931f]" />
+                 <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Markt-Benchmark (Netto Kalt)</h3>
+               </div>
              </div>
-             <div className="p-4 h-[240px]">
+             <div className="p-10 h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 9, fontWeight: '900', fill: '#64748b'}} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#94a3b8'}} width={35} />
-                    <Tooltip cursor={{fill: '#f8fafc'}} />
-                    <Bar dataKey="price" barSize={40} radius={[6, 6, 0, 0]}>
+                  <ComposedChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#475569'}} />
+                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#475569'}} width={40} />
+                    <Tooltip contentStyle={{backgroundColor: '#020617', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff'}} cursor={{fill: 'rgba(255,255,255,0.02)'}} />
+                    <Bar dataKey="price" barSize={60} radius={[12, 12, 0, 0]}>
                       {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                     </Bar>
                   </ComposedChart>
@@ -81,21 +86,48 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
              </div>
            </div>
 
-           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-             <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">
-               Einflussfaktoren
-             </h4>
+           {/* Detailed Location Analysis Grid */}
+           {result.detailedLocationAnalysis && (
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-[#1e293b] p-6 rounded-[2rem] border border-white/5 col-span-1 md:col-span-2">
+                   <div className="flex items-center gap-3 mb-4">
+                     <div className="p-2 bg-indigo-500/10 rounded-xl"><Bus size={16} className="text-indigo-400" /></div>
+                     <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Infrastruktur & Versorgung</h4>
+                   </div>
+                   <p className="text-xs text-slate-300 leading-relaxed font-medium">{result.detailedLocationAnalysis.infrastructure}</p>
+                </div>
+                <div className="bg-[#1e293b] p-6 rounded-[2rem] border border-white/5">
+                   <div className="flex items-center gap-3 mb-4">
+                     <div className="p-2 bg-pink-500/10 rounded-xl"><Users size={16} className="text-pink-400" /></div>
+                     <h4 className="text-[10px] font-black text-pink-400 uppercase tracking-widest">Sozio-Demografie</h4>
+                   </div>
+                   <p className="text-xs text-slate-300 leading-relaxed font-medium">{result.detailedLocationAnalysis.demographics}</p>
+                </div>
+                <div className="bg-[#1e293b] p-6 rounded-[2rem] border border-white/5">
+                   <div className="flex items-center gap-3 mb-4">
+                     <div className="p-2 bg-emerald-500/10 rounded-xl"><LineChart size={16} className="text-emerald-400" /></div>
+                     <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Markt-Dynamik</h4>
+                   </div>
+                   <p className="text-xs text-slate-300 leading-relaxed font-medium">{result.detailedLocationAnalysis.marketTrend}</p>
+                </div>
+             </div>
+           )}
+
+           <div className="bg-[#1e293b] rounded-[2.5rem] p-10 border border-white/5">
+             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-8 border-b border-white/5 pb-4">
+               Wertbeeinflussende Faktoren (Hebel)
+             </h4>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {result.featureImpacts.map((feat, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className={`shrink-0 w-6 h-6 rounded flex items-center justify-center ${
-                      feat.direction === 'positive' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                  <div key={i} className="flex gap-4">
+                    <div className={`shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center ${
+                      feat.direction === 'positive' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'
                     }`}>
-                      {feat.direction === 'positive' ? <PlusCircle size={12} /> : <MinusCircle size={12} />}
+                      {feat.direction === 'positive' ? <PlusCircle size={18} /> : <MinusCircle size={18} />}
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-800">{feat.feature} ({feat.impactPercent}%)</p>
-                      <p className="text-[10px] text-slate-500 leading-tight">{feat.description}</p>
+                      <p className="text-sm font-black text-white tracking-tight">{feat.feature} ({feat.direction === 'positive' ? '+' : ''}{feat.impactPercent}%)</p>
+                      <p className="text-xs text-slate-500 leading-relaxed mt-1">{feat.description}</p>
                     </div>
                   </div>
                 ))}
@@ -103,15 +135,32 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
            </div>
         </div>
 
-        <div className="lg:col-span-5">
-           <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-xl h-full flex flex-col justify-between">
-              <div>
-                <p className="text-[8px] text-[#f5931f] font-black uppercase tracking-widest mb-3">Fazit</p>
-                <p className="text-md font-serif italic leading-relaxed">"{result.locationAnalysis}"</p>
+        <div className="lg:col-span-5 h-full">
+           <div className="bg-[#020617] rounded-[2.5rem] p-12 text-white shadow-2xl h-full flex flex-col justify-between border border-[#f5931f]/10 relative overflow-hidden group">
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#f5931f]/10 blur-[100px] group-hover:bg-[#f5931f]/20 transition-all duration-1000"></div>
+              <div className="relative z-10">
+                <p className="text-[10px] text-[#f5931f] font-black uppercase tracking-[0.3em] mb-8">Strategisches Fazit</p>
+                <div className="flex gap-4">
+                    <Quote size={24} className="text-[#f5931f] shrink-0 opacity-50" />
+                    <p className="text-xl font-serif italic leading-relaxed text-slate-200">{result.locationAnalysis}</p>
+                </div>
+                
+                <div className="mt-12 p-6 bg-white/5 rounded-2xl border border-white/5">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Objekt-Status:</p>
+                  <p className="text-xs text-white font-black uppercase tracking-widest">Optimales Steigerungspotential identifiziert.</p>
+                </div>
               </div>
-              <button className="mt-6 w-full py-3 bg-white text-slate-900 rounded-xl font-black text-xs hover:bg-[#f5931f] hover:text-white transition-all flex items-center justify-center gap-2">
-                Kontakt Experten-Team <ArrowRight size={14} />
-              </button>
+              
+              <div className="relative z-10 mt-12 flex flex-col gap-4">
+                <a 
+                  href="https://bundwimmobilien.de/kontaktformular/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-full py-5 bg-[#034933] text-white rounded-2xl font-black text-xs hover:bg-white hover:text-emerald-900 transition-all shadow-xl flex items-center justify-center gap-4 uppercase tracking-[0.2em] border border-white/10"
+                >
+                  Jetzt Beraten Lassen <ArrowRight size={18} />
+                </a>
+              </div>
            </div>
         </div>
       </div>

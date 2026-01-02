@@ -13,52 +13,77 @@ export enum Condition {
   NEEDS_RENOVATION = 'Renovierungsbedürftig'
 }
 
+export enum EnergyClass {
+  APLUS = 'A+',
+  A = 'A',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  E = 'E',
+  F = 'F',
+  G = 'G',
+  H = 'H',
+  UNKNOWN = 'Unbekannt'
+}
+
 export interface UserInput {
   address: string;
   propertyType: PropertyType;
   sizeSqm: number;
   rooms: number;
+  floor: number;
   yearBuilt: number;
   condition: Condition;
+  energyClass: EnergyClass;
   currentColdRent: number;
-  hasTripleGlazing: boolean;
-  hasBalcony: boolean;
+  
+  // Modernisierung & Ausstattung
+  hasEBK: boolean;
   hasFloorHeating: boolean;
-  isBarrierFree: boolean;
-  hasModernBathroom: boolean;
-}
-
-export interface GroundingSource {
-  uri: string;
-  title: string;
+  hasBalcony: boolean;
+  hasElevator: boolean;
+  hasTripleGlazing: boolean;
+  hasModernBath: boolean;
+  
+  // Lage
+  isQuietLocation: boolean;
+  hasParking: boolean;
+  
+  sanitaryModernizationYear?: number;
+  heatingModernizationYear?: number;
+  insulationModernizationYear?: number;
 }
 
 export interface FeatureImpact {
   feature: string;
   impactPercent: number;
-  direction: 'positive' | 'negative';
+  direction: 'positive' | 'negative' | 'neutral';
   description: string;
 }
 
-// Added LocationZone interface to satisfy components/ZoneExplorer.tsx and components/AnalysisResults.tsx
 export interface LocationZone {
   id: string;
   name: string;
   description: string;
+  impactPercent: string;
   color?: string;
   examples?: string[];
+}
+
+export interface DetailedLocationAnalysis {
+  infrastructure: string;
+  demographics: string;
+  marketTrend: string;
 }
 
 export interface AnalysisResult {
   estimatedMarketRentPerSqm: number;
   estimatedTotalMarketRent: number;
-  locationAnalysis: string;
+  locationAnalysis: string; // Kurzes Fazit
+  detailedLocationAnalysis: DetailedLocationAnalysis; // Neu: Detaillierte Analyse
   potentialYearlyGain: number;
   rentGapPercentage: number;
-  sourceType: string;
   confidenceScore: number;
   featureImpacts: FeatureImpact[];
-  sources: GroundingSource[];
-  // Added optional locationZones property to satisfy component usage
   locationZones?: LocationZone[];
 }

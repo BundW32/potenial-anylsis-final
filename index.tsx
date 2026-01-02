@@ -1,11 +1,13 @@
 
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
+import ReactDOM from 'react-dom/client';
+import App from './App'; // Import ohne Endung ist Standard für Vite bei TSX
 
-const container = document.getElementById('root');
-if (container) {
-  const root = createRoot(container);
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  console.error("Critical Error: Root element not found.");
+} else {
+  const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
       <App />

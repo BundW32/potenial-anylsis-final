@@ -1,20 +1,24 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Abhängigkeiten
-node_modules/
-.pnp
-.pnp.js
+node_modules
+dist
+dist-ssr
+*.local
 
-# Build-Output
-dist/
-build/
-
-# Lokale Entwicklung
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# System-Dateien
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
