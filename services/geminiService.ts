@@ -38,11 +38,19 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
       detailedLocationAnalysis: {
         type: Type.OBJECT,
         properties: {
-          infrastructure: { type: Type.STRING, description: "Analyse der Infrastruktur im Stadtteil" },
-          demographics: { type: Type.STRING, description: "Analyse der Demografie im Stadtteil" },
-          marketTrend: { type: Type.STRING, description: "Analyse des Markttrends im Stadtteil" },
+          infrastructure: { type: Type.STRING, description: "Analyse der Infrastruktur im Stadtteil (kurz)" },
+          demographics: { type: Type.STRING, description: "Analyse der Demografie im Stadtteil (kurz)" },
+          marketTrend: { type: Type.STRING, description: "Analyse des Markttrends im Stadtteil (kurz)" },
         },
         required: ["infrastructure", "demographics", "marketTrend"],
+      },
+      locationQualityScore: {
+        type: Type.NUMBER,
+        description: "Bewertung der Mikrolage auf einer Skala von 0 (Sehr schlecht) bis 100 (Absolute Top-Lage).",
+      },
+      locationQualityLabel: {
+        type: Type.STRING,
+        description: "Kurzes Label für die Lagequalität, z.B. 'A-Lage', 'Gehobene B-Lage', 'Trendviertel', 'Einfache Lage'.",
       },
       potentialYearlyGain: {
         type: Type.NUMBER,
@@ -90,6 +98,8 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
       "estimatedTotalMarketRent",
       "locationAnalysis",
       "detailedLocationAnalysis",
+      "locationQualityScore",
+      "locationQualityLabel",
       "potentialYearlyGain",
       "rentGapPercentage",
       "confidenceScore",
@@ -114,28 +124,18 @@ export const analyzePotential = async (input: UserInput): Promise<AnalysisResult
     - Etage: ${input.floor}
     - Baujahr: ${input.yearBuilt}
     - Zustand: ${input.condition}
-    - Energieeffizienzklasse: ${input.energyClass}
     - Aktuelle Kaltmiete: ${input.currentColdRent} EUR
     
-    AUSSTATTUNG & MODERNISIERUNG:
-    - EBK: ${input.hasEBK ? "Ja" : "Nein"}
-    - Fußbodenheizung: ${input.hasFloorHeating ? "Ja" : "Nein"}
-    - Balkon/Terrasse: ${input.hasBalcony ? "Ja" : "Nein"}
-    - Aufzug: ${input.hasElevator ? "Ja" : "Nein"}
-    - 3-fach Verglasung: ${input.hasTripleGlazing ? "Ja" : "Nein"}
-    - Modernes Bad: ${input.hasModernBath ? "Ja" : "Nein"}
-    - Stellplatz: ${input.hasParking ? "Ja" : "Nein"}
-    - Ruhige Lage: ${input.isQuietLocation ? "Ja" : "Nein"}
-    - Sanitär modernisiert: ${input.sanitaryModernizationYear || "Nein"}
-    - Heizung modernisiert: ${input.heatingModernizationYear || "Nein"}
-    - Dämmung modernisiert: ${input.insulationModernizationYear || "Nein"}
-
     AUFGABE (KRITISCH):
-    1. Identifiziere den EXAKTEN Stadtteil (Mikrolage) dieser Adresse. 
-    2. Verwende Mietpreise, die spezifisch für diesen Stadtteil gelten, NICHT den Durchschnitt der Gesamtstadt.
-    3. Beispiel: Unterscheide zwischen "München-Lehel" (teuer) und "München-Hasenbergl" (günstiger), oder "Berlin-Mitte" vs "Berlin-Marzahn".
-    4. Analysiere die Infrastruktur genau an diesem Standort (ÖPNV Anbindung, Lärmpegel, Nähe zu Parks).
-    5. Berücksichtige Mietspiegel-Niveaus für diese spezifische Wohnlage.
+    1. Identifiziere den EXAKTEN Stadtteil (Mikrolage).
+    2. Bewerte die Mikrolage präzise auf einer Skala von 0-100 (locationQualityScore). 
+       - 90-100: Absolute Bestlage (z.B. München Lehel, Hamburg Harvestehude)
+       - 75-89: Gute bis sehr gute Lage
+       - 50-74: Durchschnittliche Lage
+       - <50: Einfache Lage
+    3. Gib der Lage ein Label (locationQualityLabel), z.B. "Trendlage", "Familiäre Bestlage", "Entwicklungsgebiet".
+    4. Analysiere Infrastruktur, Demografie und Trend für genau diesen Kiez.
+    5. locationZones soll eine Einordnung enthalten (z.B. Vergleich zum Stadtdurchschnitt).
     
     Deine Schätzung muss die Realität des Stadtteils widerspiegeln.
   `;

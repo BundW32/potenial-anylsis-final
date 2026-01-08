@@ -13,20 +13,16 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasKey, setHasKey] = useState<boolean | null>(null);
   
-  const resultsRef = useRef<HTMLDivElement>(null);
+  // Ref specifically for the ZoneExplorer/Location section
+  const zoneScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkKey = async () => {
-      // PRIORITY 1: Check Injected Environment Variables
-      // The vite.config.ts replaces process.env.API_KEY with the value of VITE_API_KEY during build.
       const envKey = process.env.API_KEY;
-
       if (envKey && typeof envKey === 'string' && envKey.length > 0 && envKey !== '""') {
         setHasKey(true);
         return;
       }
-
-      // PRIORITY 2: Google IDX Environment (Legacy support)
       if (window.aistudio) {
         try {
           const selected = await window.aistudio.hasSelectedApiKey();
@@ -35,7 +31,6 @@ const App: React.FC = () => {
           setHasKey(false); 
         }
       } else {
-        // Fallback: No key found in any environment
         setHasKey(false);
       }
     };
@@ -60,7 +55,12 @@ const App: React.FC = () => {
     try {
       const analysis = await analyzePotential(data);
       setResult(analysis);
-      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 500);
+      
+      // Scroll directly to the ZoneExplorer (Location Analysis) after a short delay for rendering
+      setTimeout(() => {
+        zoneScrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 600);
+      
     } catch (err: any) {
       setError(err.message || "Die Analyse konnte nicht abgeschlossen werden.");
     } finally {
@@ -79,9 +79,7 @@ const App: React.FC = () => {
           <div className="space-y-2">
             <h2 className="text-xl font-black text-white uppercase tracking-tight">Systemzugriff erforderlich</h2>
             <p className="text-slate-500 text-xs leading-relaxed uppercase tracking-widest font-bold">
-              {isIDX 
-                ? "B&W Real-Time Intelligence" 
-                : "API Key Konfiguration fehlt"}
+              {isIDX ? "B&W Real-Time Intelligence" : "API Key Konfiguration fehlt"}
             </p>
             {!isIDX && (
               <div className="text-slate-400 text-sm space-y-2">
@@ -118,7 +116,6 @@ const App: React.FC = () => {
     <div className="w-full bg-[#020617] text-slate-300 font-sans selection:bg-[#f5931f]/30 py-10 lg:py-20 rounded-[2rem] overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 space-y-12">
         
-        {/* Widget Branding Header */}
         <div className="flex flex-col items-center text-center space-y-4 mb-16">
           <div className="flex flex-col items-center">
              <h1 className="text-3xl font-black text-white leading-none uppercase tracking-tighter">B&W</h1>
@@ -144,11 +141,10 @@ const App: React.FC = () => {
           </div>
         )}
 
-        <div ref={resultsRef} className="scroll-mt-10">
-          {result && userInput && (
-            <AnalysisResults result={result} input={userInput} />
-          )}
-        </div>
+        {/* We pass the zoneScrollRef down to AnalysisResults */}
+        {result && userInput && (
+          <AnalysisResults result={result} input={userInput} zoneRef={zoneScrollRef} />
+        )}
 
         <div className="pt-12 border-t border-white/5 opacity-40">
           <div className="flex items-start gap-4 text-slate-500 max-w-2xl mx-auto text-center flex-col items-center">

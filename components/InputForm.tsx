@@ -55,11 +55,11 @@ const InputForm: React.FC<InputFormProps> = ({ isLoading, onSubmit }) => {
     insulationModernizationYear: 2018,
     hasEBK: false,
     hasFloorHeating: false,
-    hasBalcony: true,
+    hasBalcony: false,
     hasElevator: false,
     hasTripleGlazing: false,
-    hasModernBath: true,
-    isQuietLocation: true,
+    hasModernBath: false,
+    isQuietLocation: false,
     hasParking: false
   });
 

@@ -28,8 +28,8 @@ export enum EnergyClass {
 
 export interface UserInput {
   address: string;
-  district?: string; // Neu: Stadtteil für Mikrolage
-  city?: string;     // Neu: Stadt
+  district?: string;
+  city?: string;
   propertyType: PropertyType;
   sizeSqm: number;
   rooms: number;
@@ -39,7 +39,6 @@ export interface UserInput {
   energyClass: EnergyClass;
   currentColdRent: number;
   
-  // Modernisierung & Ausstattung
   hasEBK: boolean;
   hasFloorHeating: boolean;
   hasBalcony: boolean;
@@ -47,7 +46,6 @@ export interface UserInput {
   hasTripleGlazing: boolean;
   hasModernBath: boolean;
   
-  // Lage
   isQuietLocation: boolean;
   hasParking: boolean;
   
@@ -81,8 +79,13 @@ export interface DetailedLocationAnalysis {
 export interface AnalysisResult {
   estimatedMarketRentPerSqm: number;
   estimatedTotalMarketRent: number;
-  locationAnalysis: string; // Kurzes Fazit
-  detailedLocationAnalysis: DetailedLocationAnalysis; // Neu: Detaillierte Analyse
+  locationAnalysis: string;
+  detailedLocationAnalysis: DetailedLocationAnalysis;
+  
+  // Neu: Spezifisches Lage-Scoring
+  locationQualityScore: number; // 0-100
+  locationQualityLabel: string; // z.B. "A-Lage", "Top Mikrolage", "Entwicklungslage"
+
   potentialYearlyGain: number;
   rentGapPercentage: number;
   confidenceScore: number;
@@ -90,7 +93,6 @@ export interface AnalysisResult {
   locationZones?: LocationZone[];
 }
 
-// Global declaration for the AI Studio IDX environment
 declare global {
   interface AIStudio {
     hasSelectedApiKey(): Promise<boolean>;
@@ -98,7 +100,6 @@ declare global {
   }
 
   interface Window {
-    // Use the named interface to avoid type conflicts
     aistudio?: AIStudio;
   }
 }

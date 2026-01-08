@@ -8,9 +8,10 @@ import ZoneExplorer from './ZoneExplorer';
 interface AnalysisResultsProps {
   result: AnalysisResult;
   input: UserInput;
+  zoneRef?: React.RefObject<HTMLDivElement>;
 }
 
-const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
+const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input, zoneRef }) => {
   const currentPerSqm = input.currentColdRent / input.sizeSqm;
   const targetPerSqm = result.estimatedMarketRentPerSqm;
 
@@ -54,12 +55,17 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
         </div>
       </div>
 
-      {result.locationZones && (
-        <ZoneExplorer 
-          zones={result.locationZones} 
-          cityName={input.address.split(',').pop()?.trim() || 'Objektort'} 
-        />
-      )}
+      {/* Zone Explorer with Ref for direct scrolling */}
+      <div ref={zoneRef} className="scroll-mt-24">
+         <ZoneExplorer 
+            zones={result.locationZones || []} 
+            cityName={input.city || input.address.split(',').pop()?.trim() || 'Objektort'} 
+            districtName={input.district}
+            qualityScore={result.locationQualityScore}
+            qualityLabel={result.locationQualityLabel}
+            detailedAnalysis={result.detailedLocationAnalysis}
+         />
+      </div>
 
       {/* Main Analysis Block */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -85,33 +91,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({ result, input }) => {
                 </ResponsiveContainer>
              </div>
            </div>
-
-           {/* Detailed Location Analysis Grid */}
-           {result.detailedLocationAnalysis && (
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-[#1e293b] p-6 rounded-[2rem] border border-white/5 col-span-1 md:col-span-2">
-                   <div className="flex items-center gap-3 mb-4">
-                     <div className="p-2 bg-indigo-500/10 rounded-xl"><Bus size={16} className="text-indigo-400" /></div>
-                     <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Infrastruktur & Versorgung</h4>
-                   </div>
-                   <p className="text-xs text-slate-300 leading-relaxed font-medium">{result.detailedLocationAnalysis.infrastructure}</p>
-                </div>
-                <div className="bg-[#1e293b] p-6 rounded-[2rem] border border-white/5">
-                   <div className="flex items-center gap-3 mb-4">
-                     <div className="p-2 bg-pink-500/10 rounded-xl"><Users size={16} className="text-pink-400" /></div>
-                     <h4 className="text-[10px] font-black text-pink-400 uppercase tracking-widest">Sozio-Demografie</h4>
-                   </div>
-                   <p className="text-xs text-slate-300 leading-relaxed font-medium">{result.detailedLocationAnalysis.demographics}</p>
-                </div>
-                <div className="bg-[#1e293b] p-6 rounded-[2rem] border border-white/5">
-                   <div className="flex items-center gap-3 mb-4">
-                     <div className="p-2 bg-emerald-500/10 rounded-xl"><LineChart size={16} className="text-emerald-400" /></div>
-                     <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Markt-Dynamik</h4>
-                   </div>
-                   <p className="text-xs text-slate-300 leading-relaxed font-medium">{result.detailedLocationAnalysis.marketTrend}</p>
-                </div>
-             </div>
-           )}
 
            <div className="bg-[#1e293b] rounded-[2.5rem] p-10 border border-white/5">
              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-8 border-b border-white/5 pb-4">
